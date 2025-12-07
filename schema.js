@@ -1,0 +1,48 @@
+const Joi = require('joi');
+
+// module.exports.listingschema = Joi.object({
+//     listing: Joi.object({
+//         title : Joi.string().required(),
+//         description : Joi.string().required(),
+//         location : Joi.string().required(),
+//         country : Joi.string().required(),
+//         price : Joi.number().required().min(1),
+//         image : Joi.string().allow ("" , null),
+//     }).required() 
+
+// });
+
+
+module.exports.listingschema = Joi.object({
+  listing: Joi.object({
+    title: Joi.string().required(),
+    description: Joi.string().required(),
+    location: Joi.string().required().messages({
+      'any.required': 'Location is required',
+      'string.empty': 'Location cannot be empty'
+    }),
+    country: Joi.string().required().messages({
+      'any.required': 'Country is required',
+      'string.empty': 'Country cannot be empty'
+    }),
+    price: Joi.number().required().min(1).messages({
+      'any.required': 'Price is required',
+      'number.min': 'Price must be at least 1'
+    }),
+    image: Joi.string().allow("", null)
+  }).required()
+});
+
+module.exports.reviewschema = Joi.object({
+  review: Joi.object({
+    rating: Joi.number().required().min(1).max(5).messages({
+      'any.required': 'Rating is required',
+      'number.min': 'Rating must be at least 1',
+      'number.max': 'Rating cannot be more than 5'
+    }),
+    comment: Joi.string().required().messages({
+      'any.required': 'Comment is required',
+      'string.empty': 'Comment cannot be empty'
+    })
+  }).required()
+});
