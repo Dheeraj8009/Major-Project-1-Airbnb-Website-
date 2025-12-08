@@ -13,16 +13,18 @@ const { listingschema, reviewschema } = require('./schema.js');
 const session = require('express-session');
 const flash = require('connect-flash');
 
-// const passport = require('passport');
-// const LocalStrategy = require('passport-local');
-// const User = require('./models/user');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const User = require('./models/user');
 
 
 // const Review = require('./models/review.js');
 const Review = require('./models/review');
 
-const listings = require('./routes/listing.js');
-const reviews = require('./routes/review.js');
+const listingRouter = require('./routes/listing.js');
+const reviewRouter = require('./routes/review.js');
+const userRouter = require('./routes/user.js');
+
 
 
 app.engine('ejs', ejsMate);
@@ -68,17 +70,18 @@ app.get('/', (req, res) => {
 app.use(session(sessionOptions));
 app.use(flash());
 
-// app.use(passport.initialize());
-// app.use(passport.session());
-// passport.use(new LocalStrategy(User.authenticate()));
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
 
-// passport.serializeUser(User.serializeUser());
-// passport.deserializeUser(User.deserializeUser());
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 
 app.use((req, res, next) => {
   res.locals.success = req.flash('success');
   res.locals.error = req.flash('error');
+  res.locals.currUser = req.user;
   next();
 });
 
@@ -93,8 +96,9 @@ app.use((req, res, next) => {
 
 
 
-app.use('/listings', listings);
-app.use('/listings/:id/reviews', reviews);
+app.use('/listings', listingRouter);
+app.use('/listings/:id/reviews', reviewRouter);
+app.use('/', userRouter);
 
 // app.get("/testListing", (req, res) => {
 //   let sampleListing = new Listing({
